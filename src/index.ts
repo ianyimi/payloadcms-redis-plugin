@@ -1,113 +1,54 @@
-import type { CollectionSlug, Config } from 'payload'
+import type { Redis } from 'ioredis'
+import type { Config } from 'payload'
 
-import { customEndpointHandler } from './endpoints/customEndpointHandler.js'
+import type { RedisPluginConfig } from './types.js'
 
-export type MyPluginConfig = {
-  /**
-   * List of collections to add a custom field
-   */
-  collections?: Partial<Record<CollectionSlug, true>>
-  disabled?: boolean
-}
+import { dbAdapterWithCache } from './adapter.js'
 
 export const myPlugin =
-  (pluginOptions: MyPluginConfig) =>
-  (config: Config): Config => {
-    if (!config.collections) {
-      config.collections = []
-    }
+	(pluginConfig: RedisPluginConfig) =>
+		(config: Config): Config => {
+			const incomingOnInit = config.onInit
 
-    config.collections.push({
-      slug: 'plugin-collection',
-      fields: [
-        {
-          name: 'id',
-          type: 'text',
-        },
-      ],
-    })
+			config.onInit = async (payload) => {
+				// Ensure we are executing any existing onInit functions before running our own.
+				if (incomingOnInit) {
+					await incomingOnInit(payload)
+				}
 
-    if (pluginOptions.collections) {
-      for (const collectionSlug in pluginOptions.collections) {
-        const collection = config.collections.find(
-          (collection) => collection.slug === collectionSlug,
-        )
+				let redis: Redis
 
-        if (collection) {
-          collection.fields.push({
-            name: 'addedByPlugin',
-            type: 'text',
-            admin: {
-              position: 'sidebar',
-            },
-          })
-        }
-      }
-    }
+				if (pluginConfig.redis.client) {
+					redis = pluginConfig.redis.client
+				} else if (pluginConfig.redis.url) {
+					try {
+						const { Redis } = await import('ioredis')
+						redis = new Redis(pluginConfig.redis.url)
+					} catch (err) {
+						console.error(
+							'[RedisPlugin] Failed to import ioredis. Please install it: npm install ioredis',
+						)
+						throw err
+					}
+				} else {
+					throw new Error('[RedisPlugin] Either redis.url or redis.client must be provided')
+				}
 
-    /**
-     * If the plugin is disabled, we still want to keep added collections/fields so the database schema is consistent which is important for migrations.
-     * If your plugin heavily modifies the database schema, you may want to remove this property.
-     */
-    if (pluginOptions.disabled) {
-      return config
-    }
+				try {
+					await redis.ping()
+				} catch (err) {
+					console.error('[RedisPlugin] Failed to connect to Redis')
+					throw err
+				}
 
-    if (!config.endpoints) {
-      config.endpoints = []
-    }
+				const baseAdapter = payload.db
 
-    if (!config.admin) {
-      config.admin = {}
-    }
+				if (!baseAdapter) {
+					throw new Error('[RedisPlugin] No database adapter found')
+				}
 
-    if (!config.admin.components) {
-      config.admin.components = {}
-    }
+				payload.db = dbAdapterWithCache({ baseAdapter, config: pluginConfig, redis })
+			}
 
-    if (!config.admin.components.beforeDashboard) {
-      config.admin.components.beforeDashboard = []
-    }
-
-    config.admin.components.beforeDashboard.push(
-      `plugin-package-name-placeholder/client#BeforeDashboardClient`,
-    )
-    config.admin.components.beforeDashboard.push(
-      `plugin-package-name-placeholder/rsc#BeforeDashboardServer`,
-    )
-
-    config.endpoints.push({
-      handler: customEndpointHandler,
-      method: 'get',
-      path: '/my-plugin-endpoint',
-    })
-
-    const incomingOnInit = config.onInit
-
-    config.onInit = async (payload) => {
-      // Ensure we are executing any existing onInit functions before running our own.
-      if (incomingOnInit) {
-        await incomingOnInit(payload)
-      }
-
-      const { totalDocs } = await payload.count({
-        collection: 'plugin-collection',
-        where: {
-          id: {
-            equals: 'seeded-by-plugin',
-          },
-        },
-      })
-
-      if (totalDocs === 0) {
-        await payload.create({
-          collection: 'plugin-collection',
-          data: {
-            id: 'seeded-by-plugin',
-          },
-        })
-      }
-    }
-
-    return config
-  }
+			return config
+		}
