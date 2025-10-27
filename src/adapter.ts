@@ -11,7 +11,13 @@ import type {
 import type { RedisPluginConfig } from './types.js'
 
 import { getCacheOptions, getFromCache, invalidateByPattern, setInCache } from './cache.js'
-import { debugLog, generateCacheKey, getCollectionPattern, shouldCacheCollection } from './utils.js'
+import {
+	debugLog,
+	generateCacheKey,
+	getCollectionPattern,
+	getGlobalPattern,
+	shouldCacheCollection,
+} from './utils.js'
 
 export function dbAdapterWithCache({
 	baseAdapter,
@@ -123,7 +129,7 @@ export function dbAdapterWithCache({
 		},
 		updateGlobal: async (args) => {
 			const result = await baseAdapter.updateGlobal(args)
-			const pattern = getCollectionPattern({ collection: args.slug, config })
+			const pattern = getGlobalPattern({ config, global: args.slug })
 			await invalidateByPattern({ pattern, redis })
 			return result
 		},
