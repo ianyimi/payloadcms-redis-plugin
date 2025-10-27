@@ -3,9 +3,12 @@ import type {
 	DatabaseAdapter,
 	FindArgs,
 	FindGlobalArgs,
+	FindGlobalVersionsArgs,
 	FindOneArgs,
 	PaginatedDocs,
+	QueryDraftsArgs,
 	TypeWithID,
+	TypeWithVersion,
 } from 'payload'
 
 import type { RedisPluginConfig } from './types.js'
@@ -52,6 +55,44 @@ export function dbAdapterWithCache({
 
 			return result
 		},
+		countGlobalVersions: async (args) => {
+			const { global } = args
+			const cache = getCacheOptions(args)
+
+			if (cache?.skip || !shouldCacheCollection({ slug: global, config })) {
+				debugLog({ config, message: `Cache SKIP: countGlobalVersions ${global}` })
+				return baseAdapter.countGlobalVersions(args)
+			}
+
+			const cacheKey = generateCacheKey({ args, config, operation: 'countGlobalVersions' })
+			const cached = await getFromCache<{ totalDocs: number }>({ key: cacheKey, redis })
+			if (cached) {
+				return cached
+			}
+
+			const result = await baseAdapter.countGlobalVersions(args)
+			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? defaultTTL })
+			return result
+		},
+		countVersions: async (args) => {
+			const { collection } = args
+			const cache = getCacheOptions(args)
+
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
+				debugLog({ config, message: `Cache SKIP: countVersions ${collection}` })
+				return baseAdapter.countVersions(args)
+			}
+
+			const cacheKey = generateCacheKey({ args, config, operation: 'countVersions' })
+			const cached = await getFromCache<{ totalDocs: number }>({ key: cacheKey, redis })
+			if (cached) {
+				return cached
+			}
+
+			const result = await baseAdapter.countVersions(args)
+			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? defaultTTL })
+			return result
+		},
 		create: async (args) => {
 			const result = await baseAdapter.create(args)
 			const pattern = getCollectionPattern({ collection: args.collection, config })
@@ -66,6 +107,12 @@ export function dbAdapterWithCache({
 		},
 		deleteOne: async (args) => {
 			const result = await baseAdapter.deleteOne(args)
+			const pattern = getCollectionPattern({ collection: args.collection, config })
+			await invalidateByPattern({ pattern, redis })
+			return result
+		},
+		deleteVersions: async (args) => {
+			const result = await baseAdapter.deleteVersions(args)
 			const pattern = getCollectionPattern({ collection: args.collection, config })
 			await invalidateByPattern({ pattern, redis })
 			return result
@@ -108,6 +155,25 @@ export function dbAdapterWithCache({
 
 			return result
 		},
+		findGlobalVersions: async <T>(args: FindGlobalVersionsArgs) => {
+			const { global } = args
+			const cache = getCacheOptions(args)
+
+			if (cache?.skip || !shouldCacheCollection({ slug: global, config })) {
+				return baseAdapter.findGlobalVersions<T>(args)
+			}
+
+			const cacheKey = generateCacheKey({ args, config, operation: 'findGlobalVersions' })
+			const cached = await getFromCache<PaginatedDocs<TypeWithVersion<T>>>({ key: cacheKey, redis })
+			if (cached) {
+				return cached
+			}
+
+			const result = await baseAdapter.findGlobalVersions<T>(args)
+			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? defaultTTL })
+
+			return result
+		},
 		findOne: async <T extends TypeWithID>(args: FindOneArgs) => {
 			const { collection } = args
 			const cache = getCacheOptions(args)
@@ -116,7 +182,7 @@ export function dbAdapterWithCache({
 				return baseAdapter.findOne<T>(args)
 			}
 
-			const cacheKey = generateCacheKey({ args, config, operation: 'find' })
+			const cacheKey = generateCacheKey({ args, config, operation: 'findOne' })
 			const cached = await getFromCache<T>({ key: cacheKey, redis })
 			if (cached) {
 				return cached
@@ -127,9 +193,34 @@ export function dbAdapterWithCache({
 
 			return result
 		},
+		queryDrafts: async <T>(args: QueryDraftsArgs) => {
+			const { collection } = args
+			const cache = getCacheOptions(args)
+
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
+				return baseAdapter.queryDrafts<T>(args)
+			}
+
+			const cacheKey = generateCacheKey({ args, config, operation: 'queryDrafts' })
+			const cached = await getFromCache<PaginatedDocs<T>>({ key: cacheKey, redis })
+			if (cached) {
+				return cached
+			}
+
+			const result = await baseAdapter.queryDrafts<T>(args)
+			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? defaultTTL })
+
+			return result
+		},
 		updateGlobal: async (args) => {
 			const result = await baseAdapter.updateGlobal(args)
 			const pattern = getGlobalPattern({ config, global: args.slug })
+			await invalidateByPattern({ pattern, redis })
+			return result
+		},
+		updateGlobalVersion: async (args) => {
+			const result = await baseAdapter.updateGlobalVersion(args)
+			const pattern = getGlobalPattern({ config, global: args.global })
 			await invalidateByPattern({ pattern, redis })
 			return result
 		},
@@ -141,6 +232,12 @@ export function dbAdapterWithCache({
 		},
 		updateOne: async (args) => {
 			const result = await baseAdapter.updateOne(args)
+			const pattern = getCollectionPattern({ collection: args.collection, config })
+			await invalidateByPattern({ pattern, redis })
+			return result
+		},
+		upsert: async (args) => {
+			const result = await baseAdapter.upsert(args)
 			const pattern = getCollectionPattern({ collection: args.collection, config })
 			await invalidateByPattern({ pattern, redis })
 			return result

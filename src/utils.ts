@@ -1,15 +1,8 @@
-import type {
-	CollectionSlug,
-	CountArgs,
-	FindArgs,
-	FindGlobalArgs,
-	FindOneArgs,
-	GlobalSlug,
-} from 'payload'
+import type { CollectionSlug, GlobalSlug } from 'payload'
 
 import { createHash } from 'crypto'
 
-import { type RedisPluginConfig } from './types.js'
+import type { DBOperationArgs, RedisPluginConfig } from './types.js'
 
 export function shouldCacheCollection({
 	slug,
@@ -34,7 +27,7 @@ export function generateCacheKey({
 	config,
 	operation,
 }: {
-	args: CountArgs | FindArgs | FindGlobalArgs | FindOneArgs
+	args: DBOperationArgs
 	config: RedisPluginConfig
 	operation: string
 }) {

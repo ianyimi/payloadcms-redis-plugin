@@ -1,11 +1,8 @@
 import type { Redis } from 'ioredis'
-import type { CountArgs, FindArgs, FindGlobalArgs } from 'payload'
 
-import type { CacheOptions } from './types.js'
+import type { CacheOptions, DBOperationArgs } from './types.js'
 
-export function getCacheOptions(
-	args: CountArgs | FindArgs | FindGlobalArgs,
-): CacheOptions | undefined {
+export function getCacheOptions(args: DBOperationArgs): CacheOptions | undefined {
 	if (args.req?.context?.cache) {
 		return args.req.context.cache
 	}

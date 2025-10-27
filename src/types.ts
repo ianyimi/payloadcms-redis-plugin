@@ -2,11 +2,21 @@ import type { Redis } from 'ioredis'
 import type {
 	CollectionSlug,
 	CountArgs,
+	CountGlobalVersionArgs,
 	FindArgs,
 	FindGlobalArgs,
 	FindOneArgs,
 	GlobalSlug,
+	QueryDraftsArgs,
 } from 'payload'
+
+export type DBOperationArgs =
+	| CountArgs
+	| CountGlobalVersionArgs
+	| FindArgs
+	| FindGlobalArgs
+	| FindOneArgs
+	| QueryDraftsArgs
 
 export type RedisPluginConfig = {
 	/**
@@ -15,10 +25,7 @@ export type RedisPluginConfig = {
 	collections?: Partial<Record<CollectionSlug, true>>
 	debug: boolean
 	defaultCacheOptions?: {
-		generateKey?: (
-			operation: string,
-			args: CountArgs | FindArgs | FindGlobalArgs | FindOneArgs,
-		) => string
+		generateKey?: (operation: string, args: DBOperationArgs) => string
 		keyPrefix: string
 		ttl?: number
 	}
