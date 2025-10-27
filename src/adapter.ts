@@ -39,7 +39,7 @@ export function dbAdapterWithCache({
 			const { collection } = args
 			const cache = getCacheOptions(args)
 
-			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: count ${collection}` })
 				return baseAdapter.count(args)
 			}
@@ -59,7 +59,7 @@ export function dbAdapterWithCache({
 			const { global } = args
 			const cache = getCacheOptions(args)
 
-			if (cache?.skip || !shouldCacheCollection({ slug: global, config })) {
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: global, config })) {
 				debugLog({ config, message: `Cache SKIP: countGlobalVersions ${global}` })
 				return baseAdapter.countGlobalVersions(args)
 			}
@@ -78,7 +78,7 @@ export function dbAdapterWithCache({
 			const { collection } = args
 			const cache = getCacheOptions(args)
 
-			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: countVersions ${collection}` })
 				return baseAdapter.countVersions(args)
 			}
@@ -95,24 +95,40 @@ export function dbAdapterWithCache({
 		},
 		create: async (args) => {
 			const result = await baseAdapter.create(args)
+			const cache = getCacheOptions(args)
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: args.collection, config })) {
+				return
+			}
 			const pattern = getCollectionPattern({ collection: args.collection, config })
 			await invalidateByPattern({ pattern, redis })
 			return result
 		},
 		deleteMany: async (args) => {
 			const result = await baseAdapter.deleteMany(args)
+			const cache = getCacheOptions(args)
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: args.collection, config })) {
+				return
+			}
 			const pattern = getCollectionPattern({ collection: args.collection, config })
 			await invalidateByPattern({ pattern, redis })
 			return result
 		},
 		deleteOne: async (args) => {
 			const result = await baseAdapter.deleteOne(args)
+			const cache = getCacheOptions(args)
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: args.collection, config })) {
+				return
+			}
 			const pattern = getCollectionPattern({ collection: args.collection, config })
 			await invalidateByPattern({ pattern, redis })
 			return result
 		},
 		deleteVersions: async (args) => {
 			const result = await baseAdapter.deleteVersions(args)
+			const cache = getCacheOptions(args)
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: args.collection, config })) {
+				return
+			}
 			const pattern = getCollectionPattern({ collection: args.collection, config })
 			await invalidateByPattern({ pattern, redis })
 			return result
@@ -121,7 +137,7 @@ export function dbAdapterWithCache({
 			const { collection } = args
 			const cache = getCacheOptions(args)
 
-			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
 				return baseAdapter.find<T>(args)
 			}
 
@@ -140,7 +156,7 @@ export function dbAdapterWithCache({
 			const { slug } = args
 			const cache = getCacheOptions(args)
 
-			if (cache?.skip || !shouldCacheCollection({ slug, config })) {
+			if (!cache || cache.skip || !shouldCacheCollection({ slug, config })) {
 				return baseAdapter.findGlobal<T>(args)
 			}
 
@@ -159,7 +175,7 @@ export function dbAdapterWithCache({
 			const { global } = args
 			const cache = getCacheOptions(args)
 
-			if (cache?.skip || !shouldCacheCollection({ slug: global, config })) {
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: global, config })) {
 				return baseAdapter.findGlobalVersions<T>(args)
 			}
 
@@ -178,7 +194,7 @@ export function dbAdapterWithCache({
 			const { collection } = args
 			const cache = getCacheOptions(args)
 
-			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
+			if (!cache || cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				return baseAdapter.findOne<T>(args)
 			}
 
@@ -197,7 +213,7 @@ export function dbAdapterWithCache({
 			const { collection } = args
 			const cache = getCacheOptions(args)
 
-			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
 				return baseAdapter.queryDrafts<T>(args)
 			}
 
@@ -214,30 +230,50 @@ export function dbAdapterWithCache({
 		},
 		updateGlobal: async (args) => {
 			const result = await baseAdapter.updateGlobal(args)
+			const cache = getCacheOptions(args)
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: args.slug, config })) {
+				return result
+			}
 			const pattern = getGlobalPattern({ config, global: args.slug })
 			await invalidateByPattern({ pattern, redis })
 			return result
 		},
 		updateGlobalVersion: async (args) => {
 			const result = await baseAdapter.updateGlobalVersion(args)
+			const cache = getCacheOptions(args)
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: args.global, config })) {
+				return result
+			}
 			const pattern = getGlobalPattern({ config, global: args.global })
 			await invalidateByPattern({ pattern, redis })
 			return result
 		},
 		updateMany: async (args) => {
 			const result = await baseAdapter.updateMany(args)
+			const cache = getCacheOptions(args)
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: args.collection, config })) {
+				return result
+			}
 			const pattern = getCollectionPattern({ collection: args.collection, config })
 			await invalidateByPattern({ pattern, redis })
 			return result
 		},
 		updateOne: async (args) => {
 			const result = await baseAdapter.updateOne(args)
+			const cache = getCacheOptions(args)
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: args.collection, config })) {
+				return result
+			}
 			const pattern = getCollectionPattern({ collection: args.collection, config })
 			await invalidateByPattern({ pattern, redis })
 			return result
 		},
 		upsert: async (args) => {
 			const result = await baseAdapter.upsert(args)
+			const cache = getCacheOptions(args)
+			if (!cache || cache.skip || !shouldCacheCollection({ slug: args.collection, config })) {
+				return result
+			}
 			const pattern = getCollectionPattern({ collection: args.collection, config })
 			await invalidateByPattern({ pattern, redis })
 			return result
