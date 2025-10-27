@@ -12,7 +12,7 @@ export function getCacheOptions(
 	// return getCacheContext();
 }
 
-export async function getFromCache<T = unknown>({
+export async function getFromCache<T>({
 	key,
 	redis,
 }: {
