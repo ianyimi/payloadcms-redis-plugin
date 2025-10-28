@@ -1,3 +1,10 @@
+## [0.2.12](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.11...v0.2.12) (2025-10-28)
+
+
+### Bug Fixes
+
+* add some support for version collections by saving them under a different key from the regular dbOperations ([76ec6be](https://github.com/ianyimi/payloadcms-redis-plugin/commit/76ec6be9805b2ab02dcd92cb78591642a00dd1d6))
+
 ## [0.2.11](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.10...v0.2.11) (2025-10-28)
 
 
