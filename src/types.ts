@@ -23,10 +23,10 @@ export type RedisPluginConfig = {
 	 * List of collections to add redis caching
 	 */
 	collections?: Partial<Record<CollectionSlug, CacheOptions | true>>
-	debug: boolean
+	debug?: boolean
 	defaultCacheOptions?: {
 		generateKey?: (operation: string, args: DBOperationArgs) => string
-		keyPrefix: string
+		keyPrefix?: string
 		ttl?: number
 	}
 	globals?: Partial<Record<GlobalSlug, CacheOptions | true>>

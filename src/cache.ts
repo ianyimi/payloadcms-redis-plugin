@@ -2,6 +2,8 @@ import type { Redis } from 'ioredis'
 
 import type { CacheOptions, DBOperationArgs, RedisPluginConfig } from './types.js'
 
+import { DEFAULT_TTL } from './utils.js'
+
 export function getCacheOptions({
 	slug,
 	args,
@@ -17,7 +19,7 @@ export function getCacheOptions({
 	for (const [key, value] of Object.entries(config.collections ?? {})) {
 		if (key === slug) {
 			if (typeof value === 'boolean') {
-				return config.defaultCacheOptions
+				return { ttl: config.defaultCacheOptions?.ttl ?? DEFAULT_TTL }
 			}
 			return value
 		}
@@ -25,14 +27,13 @@ export function getCacheOptions({
 	for (const [key, value] of Object.entries(config.globals ?? {})) {
 		if (key === slug) {
 			if (typeof value === 'boolean') {
-				return config.defaultCacheOptions
+				return { ttl: config.defaultCacheOptions?.ttl ?? DEFAULT_TTL }
 			}
 			return value
 		}
 	}
 
 	return undefined
-	// return getCacheContext();
 }
 
 export async function getFromCache<T>({

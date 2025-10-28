@@ -16,6 +16,7 @@ import type { RedisPluginConfig } from './types.js'
 import { getCacheOptions, getFromCache, invalidateByPattern, setInCache } from './cache.js'
 import {
 	debugLog,
+	DEFAULT_TTL,
 	generateCacheKey,
 	getCollectionPattern,
 	getGlobalPattern,
@@ -24,15 +25,13 @@ import {
 
 export function dbAdapterWithCache({
 	baseAdapter,
-	config,
 	redis,
+	config = { defaultCacheOptions: { ttl: DEFAULT_TTL }, redis: { url: '' } },
 }: {
 	baseAdapter: DatabaseAdapter
 	config: RedisPluginConfig
 	redis: Redis
 }): DatabaseAdapter {
-	const defaultTTL = config.defaultCacheOptions?.ttl ?? 300 // 5 minutes (300s)
-
 	return {
 		...baseAdapter,
 		count: async (args) => {
@@ -44,7 +43,7 @@ export function dbAdapterWithCache({
 				return baseAdapter.count(args)
 			}
 
-			const cacheKey = generateCacheKey({ args, config, operation: 'count' })
+			const cacheKey = generateCacheKey({ slug: collection, args, config, operation: 'count' })
 			const cached = await getFromCache<{ totalDocs: number }>({ key: cacheKey, redis })
 			if (cached) {
 				debugLog({ config, message: `Cache HIT: count ${collection}` })
@@ -52,7 +51,7 @@ export function dbAdapterWithCache({
 			}
 
 			const result = await baseAdapter.count(args)
-			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? defaultTTL })
+			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? DEFAULT_TTL })
 			debugLog({ config, message: `Cache MISS: count ${collection}` })
 
 			return result
@@ -66,7 +65,12 @@ export function dbAdapterWithCache({
 				return baseAdapter.countGlobalVersions(args)
 			}
 
-			const cacheKey = generateCacheKey({ args, config, operation: 'countGlobalVersions' })
+			const cacheKey = generateCacheKey({
+				slug: global,
+				args,
+				config,
+				operation: 'countGlobalVersions',
+			})
 			const cached = await getFromCache<{ totalDocs: number }>({ key: cacheKey, redis })
 			if (cached) {
 				debugLog({ config, message: `Cache HIT: countGlobalVersions ${global}` })
@@ -74,7 +78,7 @@ export function dbAdapterWithCache({
 			}
 
 			const result = await baseAdapter.countGlobalVersions(args)
-			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? defaultTTL })
+			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? DEFAULT_TTL })
 			debugLog({ config, message: `Cache MISS: countGlobalVersions ${global}` })
 			return result
 		},
@@ -87,7 +91,12 @@ export function dbAdapterWithCache({
 				return baseAdapter.countVersions(args)
 			}
 
-			const cacheKey = generateCacheKey({ args, config, operation: 'countVersions' })
+			const cacheKey = generateCacheKey({
+				slug: collection,
+				args,
+				config,
+				operation: 'countVersions',
+			})
 			const cached = await getFromCache<{ totalDocs: number }>({ key: cacheKey, redis })
 			if (cached) {
 				debugLog({ config, message: `Cache HIT: countVersions ${collection}` })
@@ -95,7 +104,7 @@ export function dbAdapterWithCache({
 			}
 
 			const result = await baseAdapter.countVersions(args)
-			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? defaultTTL })
+			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? DEFAULT_TTL })
 			debugLog({ config, message: `Cache MISS: countVersions ${collection}` })
 			return result
 		},
@@ -160,7 +169,7 @@ export function dbAdapterWithCache({
 				return baseAdapter.find<T>(args)
 			}
 
-			const cacheKey = generateCacheKey({ args, config, operation: 'find' })
+			const cacheKey = generateCacheKey({ slug: collection, args, config, operation: 'find' })
 			const cached = await getFromCache<PaginatedDocs<T>>({ key: cacheKey, redis })
 			if (cached) {
 				debugLog({ config, message: `Cache HIT: find ${collection}` })
@@ -168,7 +177,7 @@ export function dbAdapterWithCache({
 			}
 
 			const result = await baseAdapter.find<T>(args)
-			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? defaultTTL })
+			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? DEFAULT_TTL })
 			debugLog({ config, message: `Cache MISS: find ${collection}` })
 
 			return result
@@ -182,7 +191,7 @@ export function dbAdapterWithCache({
 				return baseAdapter.findGlobal<T>(args)
 			}
 
-			const cacheKey = generateCacheKey({ args, config, operation: 'findGlobal' })
+			const cacheKey = generateCacheKey({ slug, args, config, operation: 'findGlobal' })
 			const cached = await getFromCache<T>({ key: cacheKey, redis })
 			if (cached) {
 				debugLog({ config, message: `Cache HIT: findGlobal ${slug}` })
@@ -190,7 +199,7 @@ export function dbAdapterWithCache({
 			}
 
 			const result = await baseAdapter.findGlobal<T>(args)
-			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? defaultTTL })
+			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? DEFAULT_TTL })
 			debugLog({ config, message: `Cache MISS: findGlobal ${slug}` })
 
 			return result
@@ -204,7 +213,12 @@ export function dbAdapterWithCache({
 				return baseAdapter.findGlobalVersions<T>(args)
 			}
 
-			const cacheKey = generateCacheKey({ args, config, operation: 'findGlobalVersions' })
+			const cacheKey = generateCacheKey({
+				slug: global,
+				args,
+				config,
+				operation: 'findGlobalVersions',
+			})
 			const cached = await getFromCache<PaginatedDocs<TypeWithVersion<T>>>({ key: cacheKey, redis })
 			if (cached) {
 				debugLog({ config, message: `Cache HIT: findGlobalVersions ${global}` })
@@ -212,7 +226,7 @@ export function dbAdapterWithCache({
 			}
 
 			const result = await baseAdapter.findGlobalVersions<T>(args)
-			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? defaultTTL })
+			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? DEFAULT_TTL })
 			debugLog({ config, message: `Cache MISS: findGlobalVersions ${global}` })
 
 			return result
@@ -226,7 +240,7 @@ export function dbAdapterWithCache({
 				return baseAdapter.findOne<T>(args)
 			}
 
-			const cacheKey = generateCacheKey({ args, config, operation: 'findOne' })
+			const cacheKey = generateCacheKey({ slug: collection, args, config, operation: 'findOne' })
 			const cached = await getFromCache<T>({ key: cacheKey, redis })
 			if (cached) {
 				debugLog({ config, message: `Cache HIT: findOne ${collection}` })
@@ -234,7 +248,7 @@ export function dbAdapterWithCache({
 			}
 
 			const result = await baseAdapter.findOne<T>(args)
-			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? defaultTTL })
+			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? DEFAULT_TTL })
 			debugLog({ config, message: `Cache MISS: findOne ${collection}` })
 
 			return result
@@ -248,7 +262,12 @@ export function dbAdapterWithCache({
 				return baseAdapter.queryDrafts<T>(args)
 			}
 
-			const cacheKey = generateCacheKey({ args, config, operation: 'queryDrafts' })
+			const cacheKey = generateCacheKey({
+				slug: collection,
+				args,
+				config,
+				operation: 'queryDrafts',
+			})
 			const cached = await getFromCache<PaginatedDocs<T>>({ key: cacheKey, redis })
 			if (cached) {
 				debugLog({ config, message: `Cache HIT: queryDrafts ${collection}` })
@@ -256,7 +275,7 @@ export function dbAdapterWithCache({
 			}
 
 			const result = await baseAdapter.queryDrafts<T>(args)
-			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? defaultTTL })
+			await setInCache({ data: result, key: cacheKey, redis, ttl: cache?.ttl ?? DEFAULT_TTL })
 			debugLog({ config, message: `Cache MISS: queryDrafts ${collection}` })
 
 			return result

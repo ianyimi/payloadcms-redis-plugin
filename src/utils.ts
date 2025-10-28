@@ -4,6 +4,8 @@ import { createHash } from 'crypto'
 
 import type { DBOperationArgs, RedisPluginConfig } from './types.js'
 
+export const DEFAULT_TTL = 300
+
 export function shouldCacheCollection({
 	slug,
 	config,
@@ -21,6 +23,7 @@ export function shouldCacheCollection({
 }
 
 export function generateCacheKey({
+	slug,
 	args,
 	config,
 	operation,
@@ -28,6 +31,7 @@ export function generateCacheKey({
 	args: DBOperationArgs
 	config: RedisPluginConfig
 	operation: string
+	slug: string
 }) {
 	const prefix = config.defaultCacheOptions?.keyPrefix
 	const generateKey = config.defaultCacheOptions?.generateKey
@@ -47,9 +51,9 @@ export function generateCacheKey({
 	}
 
 	const dataToHash = {
+		slug,
 		locale: args.locale,
 		operation,
-		req: args.req,
 		where: args.where,
 	}
 	const hash = createHash('md5').update(JSON.stringify(dataToHash)).digest('hex')
