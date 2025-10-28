@@ -5,7 +5,7 @@ import type { RedisPluginConfig } from './types.js'
 
 import { dbAdapterWithCache } from './adapter.js'
 
-export const myPlugin =
+export const redis =
 	(pluginConfig: RedisPluginConfig) =>
 		(config: Config): Config => {
 			const incomingOnInit = config.onInit
