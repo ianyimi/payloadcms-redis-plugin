@@ -1,3 +1,10 @@
+## [0.2.10](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.9...v0.2.10) (2025-10-28)
+
+
+### Bug Fixes
+
+* new readme, remove testing section for now ([309671b](https://github.com/ianyimi/payloadcms-redis-plugin/commit/309671bf9e2c03bec8ad780939fab688593d224a))
+
 ## [0.2.9](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.8...v0.2.9) (2025-10-28)
 
 
