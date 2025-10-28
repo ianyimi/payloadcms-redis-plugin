@@ -4,6 +4,7 @@ import type { Config } from 'payload'
 import type { RedisPluginConfig } from './types.js'
 
 import { dbAdapterWithCache } from './adapter.js'
+import './extendedTypes.js'
 
 export const redisCache =
 	(pluginConfig: RedisPluginConfig) =>

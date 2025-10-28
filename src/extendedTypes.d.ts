@@ -1,7 +1,7 @@
 import type { CacheOptions } from './types.ts'
 
 module 'payload' {
-	interface RequestContext {
+	export interface RequestContext {
 		cache?: CacheOptions
 	}
 }
