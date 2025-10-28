@@ -1,3 +1,10 @@
+## [0.2.11](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.10...v0.2.11) (2025-10-28)
+
+
+### Bug Fixes
+
+* add version to collection and global configs. add console.log to see what the slug is ([33c1ab8](https://github.com/ianyimi/payloadcms-redis-plugin/commit/33c1ab858133450cf5ec1e0a7fed43a4de8b93a3))
+
 ## [0.2.10](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.9...v0.2.10) (2025-10-28)
 
 
