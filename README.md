@@ -364,13 +364,6 @@ pnpm build
 pnpm lint
 ```
 
-## Testing
-
-The plugin includes comprehensive test suites:
-
-- **Integration Tests** - `pnpm test:int` (Vitest)
-- **End-to-End Tests** - `pnpm test:e2e` (Playwright)
-
 ## Examples
 
 ### E-commerce Site
