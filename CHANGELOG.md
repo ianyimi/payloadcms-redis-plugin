@@ -1,3 +1,10 @@
+## [0.2.13](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.12...v0.2.13) (2025-10-28)
+
+
+### Bug Fixes
+
+* update shouldCacheCollection function to allow for versions controls to work. additionally added a setting to cache versions by default or not. default is false ([89537f8](https://github.com/ianyimi/payloadcms-redis-plugin/commit/89537f86a407557c7e8c01fb40f52c8089d0745b))
+
 ## [0.2.12](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.11...v0.2.12) (2025-10-28)
 
 
