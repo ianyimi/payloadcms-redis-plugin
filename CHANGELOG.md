@@ -1,3 +1,10 @@
+## [0.2.2](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.1...v0.2.2) (2025-10-28)
+
+
+### Bug Fixes
+
+* move extendedTypes declaration into regular types.ts file, remove custom handling for .d.ts files ([91c6e7e](https://github.com/ianyimi/payloadcms-redis-plugin/commit/91c6e7e99d8383ee3b9751f26d9cbb3bd03484e7))
+
 ## [0.2.1](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.0...v0.2.1) (2025-10-28)
 
 
