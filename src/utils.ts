@@ -59,10 +59,10 @@ export function generateCacheKey({
 	const hash = createHash('md5').update(JSON.stringify(dataToHash)).digest('hex')
 
 	if (prefix) {
-		return `${prefix}:${operation}:${hash}`
+		return `${prefix}:${operation}:${slug}:${hash}`
 	}
 
-	return `${operation}:${hash}`
+	return `${operation}:${slug}:${hash}`
 }
 
 export function getCollectionPattern({
@@ -112,7 +112,9 @@ export function debugLog({
 	error?: boolean
 	message: string
 }) {
-	if (!config.debug) { return }
+	if (!config.debug) {
+		return
+	}
 	if (error) {
 		return console.error(`[RedisPlugin] ${message} `, data ?? '')
 	}
