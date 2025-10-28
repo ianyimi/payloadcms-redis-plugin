@@ -1,3 +1,10 @@
+## [0.2.9](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.8...v0.2.9) (2025-10-28)
+
+
+### Bug Fixes
+
+* reverse order of default cache key generation so the db table slug comes before the operation ([af3875c](https://github.com/ianyimi/payloadcms-redis-plugin/commit/af3875c9d6112bde6cf99aebdc4dc7bbfc7de6a2))
+
 ## [0.2.8](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.7...v0.2.8) (2025-10-28)
 
 
