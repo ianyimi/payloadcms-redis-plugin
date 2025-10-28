@@ -1,3 +1,10 @@
+## [0.1.2](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.1.1...v0.1.2) (2025-10-28)
+
+
+### Bug Fixes
+
+* update build outputs for plugin publishing to npm. rename exported plugin config to 'redis' from 'myPlugin' ([9a74f48](https://github.com/ianyimi/payloadcms-redis-plugin/commit/9a74f4885804000e8ec200b8071cf66508126fdc))
+
 ## [0.1.1](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.1.0...v0.1.1) (2025-10-28)
 
 
