@@ -1,3 +1,10 @@
+## [0.2.7](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.6...v0.2.7) (2025-10-28)
+
+
+### Bug Fixes
+
+* small refactors for DEFAULT_TTL const. fix generateCacheKey function so it doesnt use the circular request object in JSON.stringify to generate hashes for new keys for the cache ([3e7663f](https://github.com/ianyimi/payloadcms-redis-plugin/commit/3e7663f3347c9557d472193564f977864adee168))
+
 ## [0.2.6](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.5...v0.2.6) (2025-10-28)
 
 
