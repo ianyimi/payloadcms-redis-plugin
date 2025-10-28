@@ -1,3 +1,10 @@
+# [0.2.0](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.1.2...v0.2.0) (2025-10-28)
+
+
+### Features
+
+* remove main from releaserc.json and workflow release.yml ([9dd3033](https://github.com/ianyimi/payloadcms-redis-plugin/commit/9dd30330b3ea6d3299d6faba274a8be90ac9dcd5))
+
 ## [0.1.2](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.1.1...v0.1.2) (2025-10-28)
 
 
