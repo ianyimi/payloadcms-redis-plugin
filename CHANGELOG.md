@@ -1,3 +1,10 @@
+## [0.2.3](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.2...v0.2.3) (2025-10-28)
+
+
+### Bug Fixes
+
+* remove invalid import from index.ts file that is breaking projects ([be9ac63](https://github.com/ianyimi/payloadcms-redis-plugin/commit/be9ac63b15b4aa4f92eac590b380c6fa31358b36))
+
 ## [0.2.2](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.1...v0.2.2) (2025-10-28)
 
 
