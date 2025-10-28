@@ -40,6 +40,7 @@ export type RedisPluginConfig = {
 		}) => string
 		keyPrefix?: string
 		ttl?: number
+		versions?: boolean
 	}
 	globals?: Partial<Record<GlobalSlug, CollectionCacheOptions | true>>
 	redis:

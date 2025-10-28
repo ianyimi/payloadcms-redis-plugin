@@ -9,11 +9,24 @@ export const DEFAULT_TTL = 300
 export function shouldCacheCollection({
 	slug,
 	config,
+	versions = false,
 }: {
 	config: RedisPluginConfig
 	slug: string
+	versions?: boolean
 }) {
 	if (config.collections && Object.entries(config.collections).length > 0) {
+		if (versions) {
+			for (const [key, value] of Object.entries(config.collections)) {
+				if (key === slug) {
+					if (typeof value === 'boolean') {
+						return config.defaultCacheOptions?.versions ?? false
+					}
+					return value?.versions ?? false
+				}
+			}
+			return false
+		}
 		return Object.keys(config.collections).includes(slug)
 	}
 	if (config.globals && Object.entries(config.globals).length > 0) {
