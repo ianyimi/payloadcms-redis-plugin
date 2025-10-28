@@ -1,3 +1,10 @@
+## [0.2.6](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.5...v0.2.6) (2025-10-28)
+
+
+### Bug Fixes
+
+* combine shouldCacheGlobal into shouldCacheCollection, then fix this function to explicitly return false ([bcb08a3](https://github.com/ianyimi/payloadcms-redis-plugin/commit/bcb08a3f2b6c5cca1c78b2a65036c5f86aebf17a))
+
 ## [0.2.5](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.4...v0.2.5) (2025-10-28)
 
 
