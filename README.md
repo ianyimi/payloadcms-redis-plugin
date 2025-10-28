@@ -1,218 +1,453 @@
-# Payload Plugin Template
+# PayloadCMS Redis Plugin
 
-A template repo to create a [Payload CMS](https://payloadcms.com) plugin.
+[![npm version](https://img.shields.io/npm/v/payloadcms-redis-plugin.svg)](https://www.npmjs.com/package/payloadcms-redis-plugin)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Payload is built with a robust infrastructure intended to support Plugins with ease. This provides a simple, modular, and reusable way for developers to extend the core capabilities of Payload.
+A transparent Redis caching layer plugin for Payload CMS v3 that automatically caches database queries to improve performance.
 
-To build your own Payload plugin, all you need is:
+## Features
 
-- An understanding of the basic Payload concepts
-- And some JavaScript/Typescript experience
+- **Automatic Query Caching** - Transparently caches all read operations (find, findOne, count, etc.)
+- **Smart Invalidation** - Automatically invalidates cache on write operations (create, update, delete)
+- **Flexible Configuration** - Enable caching per collection or globally with custom TTL
+- **Per-Request Override** - Control cache behavior on individual requests
+- **Custom Cache Keys** - Generate custom cache keys based on your needs
+- **Pattern-Based Invalidation** - Invalidate related cache entries using Redis patterns
+- **Debug Mode** - Optional logging for cache hits, misses, and invalidations
+- **Zero Breaking Changes** - Works seamlessly with existing Payload applications
 
-## Background
+## Installation
 
-Here is a short recap on how to integrate plugins with Payload, to learn more visit the [plugin overview page](https://payloadcms.com/docs/plugins/overview).
+```bash
+npm install payloadcms-redis-plugin ioredis
+# or
+yarn add payloadcms-redis-plugin ioredis
+# or
+pnpm add payloadcms-redis-plugin ioredis
+```
 
-### How to install a plugin
+## Requirements
 
-To install any plugin, simply add it to your payload.config() in the Plugin array.
+- Payload CMS v3.37.0 or higher
+- Node.js 18.20.2+ or 20.9.0+
+- Redis server
 
-```ts
-import myPlugin from 'my-plugin'
+## Quick Start
 
-export const config = buildConfig({
+### Basic Setup
+
+```typescript
+import { buildConfig } from 'payload'
+import { redisCache } from 'payloadcms-redis-plugin'
+
+export default buildConfig({
   plugins: [
-    // You can pass options to the plugin
-    myPlugin({
-      enabled: true,
+    redisCache({
+      // Connect via URL
+      redis: {
+        url: 'redis://localhost:6379',
+      },
+      // Enable caching for specific collections
+      collections: {
+        posts: true,
+        articles: true,
+      },
+    }),
+  ],
+  // ... rest of your config
+})
+```
+
+### Using Existing Redis Client
+
+```typescript
+import { Redis } from 'ioredis'
+import { redisCache } from 'payloadcms-redis-plugin'
+
+const redisClient = new Redis({
+  host: 'localhost',
+  port: 6379,
+  password: 'your-password',
+  db: 0,
+})
+
+export default buildConfig({
+  plugins: [
+    redisCache({
+      // Use existing client
+      redis: {
+        client: redisClient,
+      },
+      collections: {
+        posts: true,
+      },
     }),
   ],
 })
 ```
 
-### Initialization
+## Configuration
 
-The initialization process goes in the following order:
+### Plugin Options
 
-1. Incoming config is validated
-2. **Plugins execute**
-3. Default options are integrated
-4. Sanitization cleans and validates data
-5. Final config gets initialized
+```typescript
+type RedisPluginConfig = {
+  // Redis connection (provide either client or url)
+  redis: { client: Redis; url?: never } | { client?: never; url: string }
 
-## Building the Plugin
+  // Collections to cache
+  collections?: Partial<Record<CollectionSlug, CacheOptions | true>>
 
-When you build a plugin, you are purely building a feature for your project and then abstracting it outside of the project.
+  // Globals to cache
+  globals?: Partial<Record<GlobalSlug, CacheOptions | true>>
 
-### Template Files
+  // Enable debug logging
+  debug?: boolean
 
-In the Payload [plugin template](https://github.com/payloadcms/payload/tree/main/templates/plugin), you will see a common file structure that is used across all plugins:
-
-1. root folder
-2. /src folder
-3. /dev folder
-
-#### Root
-
-In the root folder, you will see various files that relate to the configuration of the plugin. We set up our environment in a similar manner in Payload core and across other projects, so hopefully these will look familiar:
-
-- **README**.md\* - This contains instructions on how to use the template. When you are ready, update this to contain instructions on how to use your Plugin.
-- **package**.json\* - Contains necessary scripts and dependencies. Overwrite the metadata in this file to describe your Plugin.
-- .**eslint**.config.js - Eslint configuration for reporting on problematic patterns.
-- .**gitignore** - List specific untracked files to omit from Git.
-- .**prettierrc**.json - Configuration for Prettier code formatting.
-- **tsconfig**.json - Configures the compiler options for TypeScript
-- .**swcrc** - Configuration for SWC, a fast compiler that transpiles and bundles TypeScript.
-- **vitest**.config.js - Config file for Vitest, defining how tests are run and how modules are resolved
-
-**IMPORTANT\***: You will need to modify these files.
-
-#### Dev
-
-In the dev folder, you’ll find a basic payload project, created with `npx create-payload-app` and the blank template.
-
-**IMPORTANT**: Make a copy of the `.env.example` file and rename it to `.env`. Update the `DATABASE_URI` to match the database you are using and your plugin name. Update `PAYLOAD_SECRET` to a unique string.
-**You will not be able to run `pnpm/yarn dev` until you have created this `.env` file.**
-
-`myPlugin` has already been added to the `payload.config()` file in this project.
-
-```ts
-plugins: [
-  myPlugin({
-    collections: {
-      posts: true,
-    },
-  }),
-]
-```
-
-Later when you rename the plugin or add additional options, **make sure to update it here**.
-
-You may wish to add collections or expand the test project depending on the purpose of your plugin. Just make sure to keep this dev environment as simplified as possible - users should be able to install your plugin without additional configuration required.
-
-When you’re ready to start development, initiate the project with `pnpm/npm/yarn dev` and pull up [http://localhost:3000](http://localhost:3000) in your browser.
-
-#### Src
-
-Now that we have our environment setup and we have a dev project ready to - it’s time to build the plugin!
-
-**index.ts**
-
-The essence of a Payload plugin is simply to extend the payload config - and that is exactly what we are doing in this file.
-
-```ts
-export const myPlugin =
-  (pluginOptions: MyPluginConfig) =>
-  (config: Config): Config => {
-    // do cool stuff with the config here
-
-    return config
+  // Default cache behavior
+  defaultCacheOptions?: {
+    generateKey?: (operation: string, args: DBOperationArgs) => string
+    keyPrefix?: string
+    ttl?: number // in seconds, default: 300 (5 minutes)
   }
-```
-
-First, we receive the existing payload config along with any plugin options.
-
-From here, you can extend the config as you wish.
-
-Finally, you return the config and that is it!
-
-##### Spread Syntax
-
-Spread syntax (or the spread operator) is a feature in JavaScript that uses the dot notation **(...)** to spread elements from arrays, strings, or objects into various contexts.
-
-We are going to use spread syntax to allow us to add data to existing arrays without losing the existing data. It is crucial to spread the existing data correctly – else this can cause adverse behavior and conflicts with Payload config and other plugins.
-
-Let’s say you want to build a plugin that adds a new collection:
-
-```ts
-config.collections = [
-  ...(config.collections || []),
-  // Add additional collections here
-]
-```
-
-First we spread the `config.collections` to ensure that we don’t lose the existing collections, then you can add any additional collections just as you would in a regular payload config.
-
-This same logic is applied to other properties like admin, hooks, globals:
-
-```ts
-config.globals = [
-  ...(config.globals || []),
-  // Add additional globals here
-]
-
-config.hooks = {
-  ...(incomingConfig.hooks || {}),
-  // Add additional hooks here
 }
 ```
 
-Some properties will be slightly different to extend, for instance the onInit property:
+### Cache Options
 
-```ts
-import { onInitExtension } from './onInitExtension' // example file
-
-config.onInit = async (payload) => {
-  if (incomingConfig.onInit) await incomingConfig.onInit(payload)
-  // Add additional onInit code by defining an onInitExtension function
-  onInitExtension(pluginOptions, payload)
+```typescript
+type CacheOptions = {
+  key?: string // Custom cache key override
+  skip?: boolean // Skip cache for this collection/query
+  tags?: string[] // Tags for grouped invalidation (future feature)
+  ttl?: number // Time-to-live in seconds
 }
 ```
 
-If you wish to add to the onInit, you must include the **async/await**. We don’t use spread syntax in this case, instead you must await the existing `onInit` before running additional functionality.
+### Advanced Configuration
 
-In the template, we have stubbed out some addition `onInit` actions that seeds in a document to the `plugin-collection`, you can use this as a base point to add more actions - and if not needed, feel free to delete it.
+```typescript
+redisCache({
+  redis: {
+    url: process.env.REDIS_URL,
+  },
 
-##### Types.ts
+  // Configure collections with custom TTL
+  collections: {
+    posts: {
+      ttl: 600, // Cache posts for 10 minutes
+      skip: false,
+    },
+    articles: {
+      ttl: 1800, // Cache articles for 30 minutes
+    },
+    users: true, // Use default TTL (5 minutes)
+  },
 
-If your plugin has options, you should define and provide types for these options.
+  // Cache global configurations
+  globals: {
+    settings: true,
+  },
 
-```ts
-export type MyPluginConfig = {
-  /**
-   * List of collections to add a custom field
-   */
-  collections?: Partial<Record<CollectionSlug, true>>
-  /**
-   * Disable the plugin
-   */
-  disabled?: boolean
-}
-```
+  // Custom default options
+  defaultCacheOptions: {
+    keyPrefix: 'myapp',
+    ttl: 300,
+    generateKey: (operation, args) => {
+      // Custom key generation logic
+      const { slug, where, locale } = args
+      return `${slug}:${operation}:${locale || 'default'}:${JSON.stringify(where)}`
+    },
+  },
 
-If possible, include JSDoc comments to describe the options and their types. This allows a developer to see details about the options in their editor.
-
-##### Testing
-
-Having a test suite for your plugin is essential to ensure quality and stability. **Vitest** is a fast, modern testing framework that works seamlessly with Vite and supports TypeScript out of the box.
-
-Vitest organizes tests into test suites and cases, similar to other testing frameworks. We recommend creating individual tests based on the expected behavior of your plugin from start to finish.
-
-Writing tests with Vitest is very straightforward, and you can learn more about how it works in the [Vitest documentation.](https://vitest.dev/)
-
-For this template, we stubbed out `int.spec.ts` in the `dev` folder where you can write your tests.
-
-```ts
-describe('Plugin tests', () => {
-  // Create tests to ensure expected behavior from the plugin
-  it('some condition that must be met', () => {
-   // Write your test logic here
-   expect(...)
-  })
+  // Enable debug logging
+  debug: true,
 })
 ```
 
-## Best practices
+## Usage
 
-With this tutorial and the plugin template, you should have everything you need to start building your own plugin.
-In addition to the setup, here are other best practices aim we follow:
+### Per-Request Cache Control
 
-- **Providing an enable / disable option:** For a better user experience, provide a way to disable the plugin without uninstalling it. This is especially important if your plugin adds additional webpack aliases, this will allow you to still let the webpack run to prevent errors.
-- **Include tests in your GitHub CI workflow**: If you’ve configured tests for your package, integrate them into your workflow to run the tests each time you commit to the plugin repository. Learn more about [how to configure tests into your GitHub CI workflow.](https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs)
-- **Publish your finished plugin to NPM**: The best way to share and allow others to use your plugin once it is complete is to publish an NPM package. This process is straightforward and well documented, find out more [creating and publishing a NPM package here.](https://docs.npmjs.com/creating-and-publishing-scoped-public-packages/).
-- **Add payload-plugin topic tag**: Apply the tag **payload-plugin **to your GitHub repository. This will boost the visibility of your plugin and ensure it gets listed with [existing payload plugins](https://github.com/topics/payload-plugin).
-- **Use [Semantic Versioning](https://semver.org/) (SemVar)** - With the SemVar system you release version numbers that reflect the nature of changes (major, minor, patch). Ensure all major versions reference their Payload compatibility.
+Override cache behavior for individual requests:
 
-# Questions
+```typescript
+// Skip cache for a specific query
+const freshPosts = await payload.find({
+  collection: 'posts',
+  req: {
+    context: {
+      cache: {
+        skip: true, // Bypass cache, always hit database
+      },
+    },
+  },
+})
 
-Please contact [Payload](mailto:dev@payloadcms.com) with any questions about using this plugin template.
+// Custom TTL for a specific query
+const shortLivedPosts = await payload.find({
+  collection: 'posts',
+  req: {
+    context: {
+      cache: {
+        ttl: 60, // Cache for 1 minute only
+      },
+    },
+  },
+})
+
+// Custom cache key
+const customCachedPosts = await payload.find({
+  collection: 'posts',
+  req: {
+    context: {
+      cache: {
+        key: 'posts:featured',
+      },
+    },
+  },
+})
+```
+
+### Cached Operations
+
+The following database operations are automatically cached:
+
+**Read Operations** (cached before hitting database):
+
+- `find` - Query collections with pagination
+- `findOne` - Query single document by ID
+- `findGlobal` - Query global configurations
+- `findGlobalVersions` - Query global version history
+- `count` - Count documents
+- `countVersions` - Count document versions
+- `countGlobalVersions` - Count global versions
+- `queryDrafts` - Query draft documents
+
+**Write Operations** (invalidate cache after database update):
+
+- `create` - Create new document
+- `createMany` - Batch create
+- `updateOne` - Update single document
+- `updateMany` - Batch update
+- `deleteOne` - Delete single document
+- `deleteMany` - Batch delete
+- `upsert` - Create or update
+- `updateGlobal` - Update global config
+- `updateGlobalVersion` - Update global version
+- `deleteVersions` - Delete document versions
+
+## How It Works
+
+### Cache Key Generation
+
+By default, cache keys are generated using MD5 hashing:
+
+```
+[prefix]:[slug]:[operation]:[md5-hash]
+```
+
+The hash includes: `{ slug, locale, operation, where }`
+
+Example keys:
+
+```
+posts:find:a1b2c3d4e5f6g7h8
+myapp:articles:count:x9y8z7w6v5u4t3s2
+```
+
+### Cache Flow
+
+**Read Operations:**
+
+```
+Request → Check cache config → Check skip flag
+  ↓ (cache enabled)
+  Check Redis → HIT: Return cached → MISS: Hit DB → Store in Redis → Return
+  ↓ (cache disabled/skipped)
+  Hit DB directly
+```
+
+**Write Operations:**
+
+```
+Request → Execute on DB → Get cache config → Check skip flag
+  ↓ (cache enabled)
+  Invalidate pattern → Return result
+  ↓ (cache disabled/skipped)
+  Return result directly
+```
+
+### Automatic Invalidation
+
+When data changes, the plugin automatically invalidates related cache entries using pattern matching:
+
+```typescript
+// Creating a post invalidates all post queries
+await payload.create({
+  collection: 'posts',
+  data: { title: 'New Post' },
+})
+// Invalidates: posts:*, myapp:*:posts:*, etc.
+
+// Updating an article invalidates all article queries
+await payload.update({
+  collection: 'articles',
+  id: '123',
+  data: { title: 'Updated' },
+})
+// Invalidates: articles:*, myapp:*:articles:*, etc.
+```
+
+## Debug Mode
+
+Enable debug logging to monitor cache behavior:
+
+```typescript
+redisCache({
+  redis: { url: 'redis://localhost:6379' },
+  collections: { posts: true },
+  debug: true,
+})
+```
+
+Console output:
+
+```
+[RedisPlugin] [find] [posts] Cache HIT
+[RedisPlugin] [find] [articles] Cache MISS
+[RedisPlugin] [create] [posts] Invalidating pattern: posts:*
+[RedisPlugin] [update] [posts] Cache SKIP (per-request)
+```
+
+## TypeScript Support
+
+The plugin includes full TypeScript definitions and extends Payload's `RequestContext` type:
+
+```typescript
+declare module 'payload' {
+  export interface RequestContext {
+    cache?: {
+      key?: string
+      skip?: boolean
+      tags?: string[]
+      ttl?: number
+    }
+  }
+}
+```
+
+## Performance Considerations
+
+- **Default TTL**: 5 minutes (300 seconds)
+- **Pattern Matching**: Uses `redis.keys()` for invalidation (consider SCAN in production with large keyspaces)
+- **Silent Failures**: Cache errors don't break database queries
+- **Memory**: Monitor Redis memory usage based on your cache strategy
+- **Expiration**: Redis automatically removes expired keys
+
+## Development
+
+```bash
+# Install dependencies
+pnpm install
+
+# Run development server
+pnpm dev
+
+# Run tests
+pnpm test
+
+# Build plugin
+pnpm build
+
+# Lint code
+pnpm lint
+```
+
+## Testing
+
+The plugin includes comprehensive test suites:
+
+- **Integration Tests** - `pnpm test:int` (Vitest)
+- **End-to-End Tests** - `pnpm test:e2e` (Playwright)
+
+## Examples
+
+### E-commerce Site
+
+```typescript
+redisCache({
+  redis: { url: process.env.REDIS_URL },
+  collections: {
+    products: { ttl: 3600 }, // Cache products for 1 hour
+    categories: { ttl: 7200 }, // Cache categories for 2 hours
+    orders: { skip: true }, // Never cache orders
+    customers: { ttl: 600 }, // Cache customers for 10 minutes
+  },
+  globals: {
+    siteSettings: { ttl: 86400 }, // Cache site settings for 24 hours
+  },
+})
+```
+
+### Blog Platform
+
+```typescript
+redisCache({
+  redis: { url: process.env.REDIS_URL },
+  collections: {
+    posts: { ttl: 1800 }, // Cache posts for 30 minutes
+    authors: { ttl: 3600 }, // Cache authors for 1 hour
+    comments: { ttl: 300 }, // Cache comments for 5 minutes
+  },
+  defaultCacheOptions: {
+    keyPrefix: 'blog',
+    ttl: 600,
+  },
+  debug: process.env.NODE_ENV === 'development',
+})
+```
+
+## Troubleshooting
+
+### Redis Connection Issues
+
+```typescript
+// Test Redis connection
+const redis = new Redis('redis://localhost:6379')
+await redis.ping() // Should return 'PONG'
+```
+
+### Cache Not Working
+
+1. Enable debug mode to see cache behavior
+2. Verify collection/global is configured for caching
+3. Check if `skip: true` is set
+4. Ensure Redis server is running and accessible
+
+### High Memory Usage
+
+1. Reduce TTL values
+2. Be selective about which collections to cache
+3. Monitor Redis memory with `redis-cli info memory`
+4. Consider using Redis maxmemory policies
+
+## Contributing
+
+Contributions are welcome! Please see the [GitHub repository](https://github.com/ianyimi/payloadcms-redis-plugin) for issues and pull requests.
+
+## License
+
+MIT
+
+## Author
+
+Isaiah Anyimi [pls hire me](https://zaye.dev)
+
+## Links
+
+- [GitHub Repository](https://github.com/ianyimi/payloadcms-redis-plugin)
+- [NPM Package](https://www.npmjs.com/package/payloadcms-redis-plugin)
+- [Payload CMS Documentation](https://payloadcms.com/docs)
+- [Redis Documentation](https://redis.io/docs)
+- [ioredis Documentation](https://github.com/redis/ioredis)
