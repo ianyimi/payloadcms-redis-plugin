@@ -1,3 +1,10 @@
+## [0.2.4](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.3...v0.2.4) (2025-10-28)
+
+
+### Bug Fixes
+
+* add debug logs at all cache operations for better visibility. some slight refactors to make logic more consistent across functions ([dd82182](https://github.com/ianyimi/payloadcms-redis-plugin/commit/dd82182347c91da3235d1ddb0d412779eca23a7e))
+
 ## [0.2.3](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.2...v0.2.3) (2025-10-28)
 
 
