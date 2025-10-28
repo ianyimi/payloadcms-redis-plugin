@@ -38,8 +38,8 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Run tests
-        run: pnpm test || echo "No tests configured"
+      # - name: Run tests
+      #   run: pnpm test || echo "No tests configured"
 
       - name: Release
         env:

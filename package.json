@@ -1,5 +1,5 @@
 {
-	"name": "@ianyimi/payloadcms-redis-plugin",
+	"name": "payloadcms-redis-plugin",
 	"version": "0.1.1",
 	"description": "Redis Plugin for PayloadCMS v3",
 	"license": "MIT",
