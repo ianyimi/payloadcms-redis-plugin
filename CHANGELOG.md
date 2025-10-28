@@ -1,3 +1,10 @@
+## [0.1.1](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.1.0...v0.1.1) (2025-10-28)
+
+
+### Bug Fixes
+
+* set package publishConfig to access: public so it goes on the npm registry ([2a13d88](https://github.com/ianyimi/payloadcms-redis-plugin/commit/2a13d88bf83f8bea3d8dca0e1084f5160f933f7b))
+
 # [0.1.0](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.0.0...v0.1.0) (2025-10-27)
 
 
