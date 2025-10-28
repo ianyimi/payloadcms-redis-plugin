@@ -18,18 +18,22 @@ export type DBOperationArgs =
 	| FindOneArgs
 	| QueryDraftsArgs
 
+export interface CollectionCacheOptions extends CacheOptions {
+	versions?: boolean
+}
+
 export type RedisPluginConfig = {
 	/**
 	 * List of collections to add redis caching
 	 */
-	collections?: Partial<Record<CollectionSlug, CacheOptions | true>>
+	collections?: Partial<Record<CollectionSlug, CollectionCacheOptions | true>>
 	debug?: boolean
 	defaultCacheOptions?: {
 		generateKey?: (operation: string, args: DBOperationArgs) => string
 		keyPrefix?: string
 		ttl?: number
 	}
-	globals?: Partial<Record<GlobalSlug, CacheOptions | true>>
+	globals?: Partial<Record<GlobalSlug, CollectionCacheOptions | true>>
 	redis:
 	| {
 		client: Redis
