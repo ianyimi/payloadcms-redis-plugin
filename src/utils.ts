@@ -59,10 +59,10 @@ export function generateCacheKey({
 	const hash = createHash('md5').update(JSON.stringify(dataToHash)).digest('hex')
 
 	if (prefix) {
-		return `${prefix}:${operation}:${slug}:${hash}`
+		return `${prefix}:${slug}:${operation}:${hash}`
 	}
 
-	return `${operation}:${slug}:${hash}`
+	return `${slug}:${operation}:${hash}`
 }
 
 export function getCollectionPattern({
