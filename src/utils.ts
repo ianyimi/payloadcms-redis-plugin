@@ -14,12 +14,10 @@ export function shouldCacheCollection({
 	if (config.collections && Object.entries(config.collections).length > 0) {
 		return Object.keys(config.collections).includes(slug)
 	}
-}
-
-export function shouldCacheGlobal({ slug, config }: { config: RedisPluginConfig; slug: string }) {
 	if (config.globals && Object.entries(config.globals).length > 0) {
 		return Object.keys(config.globals).includes(slug)
 	}
+	return false
 }
 
 export function generateCacheKey({
