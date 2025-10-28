@@ -37,9 +37,9 @@ export function dbAdapterWithCache({
 		...baseAdapter,
 		count: async (args) => {
 			const { collection } = args
-			const cache = getCacheOptions(args)
+			const cache = getCacheOptions({ slug: collection, args, config })
 
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: count ${collection}` })
 				return baseAdapter.count(args)
 			}
@@ -59,9 +59,9 @@ export function dbAdapterWithCache({
 		},
 		countGlobalVersions: async (args) => {
 			const { global } = args
-			const cache = getCacheOptions(args)
+			const cache = getCacheOptions({ slug: global, args, config })
 
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: global, config })) {
+			if (cache?.skip || !shouldCacheCollection({ slug: global, config })) {
 				debugLog({ config, message: `Cache SKIP: countGlobalVersions ${global}` })
 				return baseAdapter.countGlobalVersions(args)
 			}
@@ -80,9 +80,9 @@ export function dbAdapterWithCache({
 		},
 		countVersions: async (args) => {
 			const { collection } = args
-			const cache = getCacheOptions(args)
+			const cache = getCacheOptions({ slug: collection, args, config })
 
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: countVersions ${collection}` })
 				return baseAdapter.countVersions(args)
 			}
@@ -102,8 +102,8 @@ export function dbAdapterWithCache({
 		create: async (args) => {
 			const { collection } = args
 			const result = await baseAdapter.create(args)
-			const cache = getCacheOptions(args)
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
+			const cache = getCacheOptions({ slug: collection, args, config })
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: create ${collection}` })
 				return
 			}
@@ -115,8 +115,8 @@ export function dbAdapterWithCache({
 		deleteMany: async (args) => {
 			const { collection } = args
 			const result = await baseAdapter.deleteMany(args)
-			const cache = getCacheOptions(args)
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
+			const cache = getCacheOptions({ slug: collection, args, config })
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: deleteMany ${collection}` })
 				return
 			}
@@ -128,8 +128,8 @@ export function dbAdapterWithCache({
 		deleteOne: async (args) => {
 			const { collection } = args
 			const result = await baseAdapter.deleteOne(args)
-			const cache = getCacheOptions(args)
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
+			const cache = getCacheOptions({ slug: collection, args, config })
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: deleteOne ${collection}` })
 				return
 			}
@@ -141,8 +141,8 @@ export function dbAdapterWithCache({
 		deleteVersions: async (args) => {
 			const { collection } = args
 			const result = await baseAdapter.deleteVersions(args)
-			const cache = getCacheOptions(args)
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
+			const cache = getCacheOptions({ slug: collection, args, config })
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: deleteVersions ${collection}` })
 				return
 			}
@@ -153,9 +153,9 @@ export function dbAdapterWithCache({
 		},
 		find: async <T = TypeWithID>(args: FindArgs) => {
 			const { collection } = args
-			const cache = getCacheOptions(args)
+			const cache = getCacheOptions({ slug: collection, args, config })
 
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: find ${collection}` })
 				return baseAdapter.find<T>(args)
 			}
@@ -175,9 +175,9 @@ export function dbAdapterWithCache({
 		},
 		findGlobal: async <T extends Record<string, unknown>>(args: FindGlobalArgs) => {
 			const { slug } = args
-			const cache = getCacheOptions(args)
+			const cache = getCacheOptions({ slug, args, config })
 
-			if (!cache || cache.skip || !shouldCacheCollection({ slug, config })) {
+			if (cache?.skip || !shouldCacheCollection({ slug, config })) {
 				debugLog({ config, message: `Cache SKIP: findGlobal ${slug}` })
 				return baseAdapter.findGlobal<T>(args)
 			}
@@ -197,9 +197,9 @@ export function dbAdapterWithCache({
 		},
 		findGlobalVersions: async <T>(args: FindGlobalVersionsArgs) => {
 			const { global } = args
-			const cache = getCacheOptions(args)
+			const cache = getCacheOptions({ slug: global, args, config })
 
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: global, config })) {
+			if (cache?.skip || !shouldCacheCollection({ slug: global, config })) {
 				debugLog({ config, message: `Cache SKIP: findGlobalVersions ${global}` })
 				return baseAdapter.findGlobalVersions<T>(args)
 			}
@@ -219,9 +219,9 @@ export function dbAdapterWithCache({
 		},
 		findOne: async <T extends TypeWithID>(args: FindOneArgs) => {
 			const { collection } = args
-			const cache = getCacheOptions(args)
+			const cache = getCacheOptions({ slug: collection, args, config })
 
-			if (!cache || cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: findOne ${collection}` })
 				return baseAdapter.findOne<T>(args)
 			}
@@ -241,9 +241,9 @@ export function dbAdapterWithCache({
 		},
 		queryDrafts: async <T>(args: QueryDraftsArgs) => {
 			const { collection } = args
-			const cache = getCacheOptions(args)
+			const cache = getCacheOptions({ slug: collection, args, config })
 
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: queryDrafts ${collection}` })
 				return baseAdapter.queryDrafts<T>(args)
 			}
@@ -264,8 +264,8 @@ export function dbAdapterWithCache({
 		updateGlobal: async (args) => {
 			const { slug } = args
 			const result = await baseAdapter.updateGlobal(args)
-			const cache = getCacheOptions(args)
-			if (!cache || cache.skip || !shouldCacheCollection({ slug, config })) {
+			const cache = getCacheOptions({ slug, args, config })
+			if (cache?.skip || !shouldCacheCollection({ slug, config })) {
 				debugLog({ config, message: `Cache SKIP: updateGlobal ${slug}` })
 				return result
 			}
@@ -277,8 +277,8 @@ export function dbAdapterWithCache({
 		updateGlobalVersion: async (args) => {
 			const { global } = args
 			const result = await baseAdapter.updateGlobalVersion(args)
-			const cache = getCacheOptions(args)
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: global, config })) {
+			const cache = getCacheOptions({ slug: global, args, config })
+			if (cache?.skip || !shouldCacheCollection({ slug: global, config })) {
 				debugLog({ config, message: `Cache SKIP: updateGlobalVersion ${global}` })
 				return result
 			}
@@ -290,8 +290,8 @@ export function dbAdapterWithCache({
 		updateMany: async (args) => {
 			const { collection } = args
 			const result = await baseAdapter.updateMany(args)
-			const cache = getCacheOptions(args)
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
+			const cache = getCacheOptions({ slug: collection, args, config })
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: updateMany ${collection}` })
 				return result
 			}
@@ -303,8 +303,8 @@ export function dbAdapterWithCache({
 		updateOne: async (args) => {
 			const { collection } = args
 			const result = await baseAdapter.updateOne(args)
-			const cache = getCacheOptions(args)
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
+			const cache = getCacheOptions({ slug: collection, args, config })
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: updateOne ${collection}` })
 				return result
 			}
@@ -316,8 +316,8 @@ export function dbAdapterWithCache({
 		upsert: async (args) => {
 			const { collection } = args
 			const result = await baseAdapter.upsert(args)
-			const cache = getCacheOptions(args)
-			if (!cache || cache.skip || !shouldCacheCollection({ slug: collection, config })) {
+			const cache = getCacheOptions({ slug: collection, args, config })
+			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: upsert ${collection}` })
 				return result
 			}

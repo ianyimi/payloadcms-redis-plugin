@@ -1,11 +1,37 @@
 import type { Redis } from 'ioredis'
 
-import type { CacheOptions, DBOperationArgs } from './types.js'
+import type { CacheOptions, DBOperationArgs, RedisPluginConfig } from './types.js'
 
-export function getCacheOptions(args: DBOperationArgs): CacheOptions | undefined {
+export function getCacheOptions({
+	slug,
+	args,
+	config,
+}: {
+	args: DBOperationArgs
+	config: RedisPluginConfig
+	slug: string
+}): CacheOptions | undefined {
 	if (args.req?.context?.cache) {
 		return args.req.context.cache
 	}
+	for (const [key, value] of Object.entries(config.collections ?? {})) {
+		if (key === slug) {
+			if (typeof value === 'boolean') {
+				return config.defaultCacheOptions
+			}
+			return value
+		}
+	}
+	for (const [key, value] of Object.entries(config.globals ?? {})) {
+		if (key === slug) {
+			if (typeof value === 'boolean') {
+				return config.defaultCacheOptions
+			}
+			return value
+		}
+	}
+
+	return undefined
 	// return getCacheContext();
 }
 
