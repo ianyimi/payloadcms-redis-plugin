@@ -54,3 +54,9 @@ export interface CacheOptions {
 	/** Custom TTL (time to live) in seconds for this query */
 	ttl?: number
 }
+
+declare module 'payload' {
+	export interface RequestContext {
+		cache?: CacheOptions
+	}
+}
