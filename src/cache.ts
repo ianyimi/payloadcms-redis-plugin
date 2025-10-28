@@ -2,24 +2,21 @@ import type { Redis } from 'ioredis'
 
 import type { CacheOptions, DBOperationArgs, RedisPluginConfig } from './types.js'
 
-import { debugLog, DEFAULT_TTL } from './utils.js'
+import { DEFAULT_TTL } from './utils.js'
 
 export function getCacheOptions({
 	slug,
 	args,
 	config,
-	version = false,
 }: {
 	args: DBOperationArgs
 	config: RedisPluginConfig
 	slug: string
-	version?: boolean
 }): CacheOptions | undefined {
 	if (args.req?.context?.cache) {
 		return args.req.context.cache
 	}
 	for (const [key, value] of Object.entries(config.collections ?? {})) {
-		debugLog({ config, message: `getCacheOptions: slug: ${slug}` })
 		if (key === slug) {
 			if (typeof value === 'boolean') {
 				return { ttl: config.defaultCacheOptions?.ttl ?? DEFAULT_TTL }

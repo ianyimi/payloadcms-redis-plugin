@@ -27,11 +27,13 @@ export function generateCacheKey({
 	args,
 	config,
 	operation,
+	versions = false,
 }: {
 	args: DBOperationArgs
 	config: RedisPluginConfig
 	operation: string
 	slug: string
+	versions?: boolean
 }) {
 	const prefix = config.defaultCacheOptions?.keyPrefix
 	const generateKey = config.defaultCacheOptions?.generateKey
@@ -45,52 +47,60 @@ export function generateCacheKey({
 	}
 	if (generateKey) {
 		if (prefix) {
-			return `${prefix}:${generateKey(operation, args)}`
+			return `${prefix}:${generateKey({ args, operation, versions })}`
 		}
-		return generateKey(operation, args)
+		return generateKey({ args, operation, versions })
 	}
 
 	const dataToHash = {
 		slug,
 		locale: args.locale,
 		operation,
+		versions,
 		where: args.where,
 	}
 	const hash = createHash('md5').update(JSON.stringify(dataToHash)).digest('hex')
 
+	const slugKey = versions ? `${slug}:versions` : slug
 	if (prefix) {
-		return `${prefix}:${slug}:${operation}:${hash}`
+		return `${prefix}:${slugKey}:${operation}:${hash}`
 	}
 
-	return `${slug}:${operation}:${hash}`
+	return `${slugKey}:${operation}:${hash}`
 }
 
 export function getCollectionPattern({
 	collection,
 	config,
+	versions = false,
 }: {
 	collection: CollectionSlug
 	config: RedisPluginConfig
+	versions?: boolean
 }) {
 	const prefix = config.defaultCacheOptions?.keyPrefix
+	const versionKey = versions ? 'versions:' : ''
 	if (prefix) {
-		return `${prefix}:*:${collection}:*`
+		return `${prefix}:*:${collection}:${versionKey}*`
 	}
-	return `${collection}:*`
+	return `${collection}:${versionKey}*`
 }
 
 export function getGlobalPattern({
 	config,
 	global,
+	versions = false,
 }: {
 	config: RedisPluginConfig
 	global: GlobalSlug
+	versions?: boolean
 }) {
 	const prefix = config.defaultCacheOptions?.keyPrefix
+	const versionKey = versions ? 'versions:' : ''
 	if (prefix) {
-		return `${prefix}:*:${global}:*`
+		return `${prefix}:*:${global}:${versionKey}*`
 	}
-	return `${global}:*`
+	return `${global}:${versionKey}*`
 }
 
 export function getTagPatterns({ config, tags }: { config: RedisPluginConfig; tags: string[] }) {

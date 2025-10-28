@@ -70,6 +70,7 @@ export function dbAdapterWithCache({
 				args,
 				config,
 				operation: 'countGlobalVersions',
+				versions: true,
 			})
 			const cached = await getFromCache<{ totalDocs: number }>({ key: cacheKey, redis })
 			if (cached) {
@@ -96,6 +97,7 @@ export function dbAdapterWithCache({
 				args,
 				config,
 				operation: 'countVersions',
+				versions: true,
 			})
 			const cached = await getFromCache<{ totalDocs: number }>({ key: cacheKey, redis })
 			if (cached) {
@@ -218,6 +220,7 @@ export function dbAdapterWithCache({
 				args,
 				config,
 				operation: 'findGlobalVersions',
+				versions: true,
 			})
 			const cached = await getFromCache<PaginatedDocs<TypeWithVersion<T>>>({ key: cacheKey, redis })
 			if (cached) {
@@ -301,7 +304,7 @@ export function dbAdapterWithCache({
 				debugLog({ config, message: `Cache SKIP: updateGlobalVersion ${global}` })
 				return result
 			}
-			const pattern = getGlobalPattern({ config, global: args.global })
+			const pattern = getGlobalPattern({ config, global: args.global, versions: true })
 			await invalidateByPattern({ pattern, redis })
 			debugLog({ config, message: `Cache INVALIDATE: updateGlobalVersion ${global}` })
 			return result

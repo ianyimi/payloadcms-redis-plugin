@@ -29,7 +29,15 @@ export type RedisPluginConfig = {
 	collections?: Partial<Record<CollectionSlug, CollectionCacheOptions | true>>
 	debug?: boolean
 	defaultCacheOptions?: {
-		generateKey?: (operation: string, args: DBOperationArgs) => string
+		generateKey?: ({
+			args,
+			operation,
+			versions,
+		}: {
+			args: DBOperationArgs
+			operation: string
+			versions: boolean
+		}) => string
 		keyPrefix?: string
 		ttl?: number
 	}
