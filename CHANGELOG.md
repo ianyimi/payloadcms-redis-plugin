@@ -1,3 +1,10 @@
+## [0.2.8](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.7...v0.2.8) (2025-10-28)
+
+
+### Bug Fixes
+
+* add slug to default generateKeyPath for redis cache config ([de273da](https://github.com/ianyimi/payloadcms-redis-plugin/commit/de273daff2bab548ad5c251db061085d3f0a597d))
+
 ## [0.2.7](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.6...v0.2.7) (2025-10-28)
 
 
