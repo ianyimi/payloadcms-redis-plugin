@@ -112,10 +112,9 @@ export function debugLog({
 	error?: boolean
 	message: string
 }) {
-	if (config.debug) {
-		if (error) {
-			return console.error(`[RedisPlugin] ${message} `, data ?? '')
-		}
-		console.log(`[RedisPlugin] ${message} `, data ?? '')
+	if (!config.debug) { return }
+	if (error) {
+		return console.error(`[RedisPlugin] ${message} `, data ?? '')
 	}
+	console.log(`[RedisPlugin] ${message} `, data ?? '')
 }
