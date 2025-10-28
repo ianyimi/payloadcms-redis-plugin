@@ -1,3 +1,10 @@
+## [0.2.5](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.4...v0.2.5) (2025-10-28)
+
+
+### Bug Fixes
+
+* refactor logic to allow caching to work based on the default config if nothing is set per request. it will also allow you to specify default cacheoptions for each collection, though versions are not fully supported yet ([064e2e3](https://github.com/ianyimi/payloadcms-redis-plugin/commit/064e2e300d56350c4884ca6065e1a547e4127fab))
+
 ## [0.2.4](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.3...v0.2.4) (2025-10-28)
 
 
