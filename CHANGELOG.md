@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.0...v0.2.1) (2025-10-28)
+
+
+### Bug Fixes
+
+* try using TS module augmentation to update payload RequestContext type with cache options ([a75b130](https://github.com/ianyimi/payloadcms-redis-plugin/commit/a75b13081e3eed060fdcbc74d826857aba58154f))
+
 # [0.2.0](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.1.2...v0.2.0) (2025-10-28)
 
 
