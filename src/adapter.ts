@@ -116,7 +116,7 @@ export function dbAdapterWithCache({
 			const cache = getCacheOptions({ slug: collection, args, config })
 			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: create ${collection}` })
-				return
+				return result
 			}
 			const pattern = getCollectionPattern({ collection, config })
 			await invalidateByPattern({ pattern, redis })
@@ -129,7 +129,7 @@ export function dbAdapterWithCache({
 			const cache = getCacheOptions({ slug: collection, args, config })
 			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: deleteMany ${collection}` })
-				return
+				return result
 			}
 			const pattern = getCollectionPattern({ collection, config })
 			await invalidateByPattern({ pattern, redis })
@@ -142,7 +142,7 @@ export function dbAdapterWithCache({
 			const cache = getCacheOptions({ slug: collection, args, config })
 			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: deleteOne ${collection}` })
-				return
+				return result
 			}
 			const pattern = getCollectionPattern({ collection, config })
 			await invalidateByPattern({ pattern, redis })
@@ -155,7 +155,7 @@ export function dbAdapterWithCache({
 			const cache = getCacheOptions({ slug: collection, args, config })
 			if (cache?.skip || !shouldCacheCollection({ slug: collection, config })) {
 				debugLog({ config, message: `Cache SKIP: deleteVersions ${collection}` })
-				return
+				return result
 			}
 			const pattern = getCollectionPattern({ collection, config })
 			await invalidateByPattern({ pattern, redis })
