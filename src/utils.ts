@@ -92,11 +92,11 @@ export function getCollectionPattern({
 	versions?: boolean
 }) {
 	const prefix = config.defaultCacheOptions?.keyPrefix
-	const versionKey = versions ? 'versions:' : ''
+	const slugKey = versions ? `${collection}:versions` : collection
 	if (prefix) {
-		return `${prefix}:*:${collection}:${versionKey}*`
+		return `${prefix}:${slugKey}:*`
 	}
-	return `${collection}:${versionKey}*`
+	return `${slugKey}:*`
 }
 
 export function getGlobalPattern({
@@ -109,11 +109,11 @@ export function getGlobalPattern({
 	versions?: boolean
 }) {
 	const prefix = config.defaultCacheOptions?.keyPrefix
-	const versionKey = versions ? 'versions:' : ''
+	const slugKey = versions ? `${global}:versions` : global
 	if (prefix) {
-		return `${prefix}:*:${global}:${versionKey}*`
+		return `${prefix}:${slugKey}:*`
 	}
-	return `${global}:${versionKey}*`
+	return `${slugKey}:*`
 }
 
 export function getTagPatterns({ config, tags }: { config: RedisPluginConfig; tags: string[] }) {
