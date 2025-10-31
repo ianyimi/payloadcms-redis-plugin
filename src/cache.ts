@@ -67,7 +67,6 @@ export async function setInCache<T>({
 	ttl: number
 }): Promise<void> {
 	try {
-		console.log(`[RedisPlugin] Setting cache key: "${key}" (TTL: ${ttl}s)`)
 		await redis.setex(key, ttl, JSON.stringify(data))
 	} catch (err) {
 		console.error('[RedisPlugin] Error writing to cache: ', err)
@@ -83,9 +82,7 @@ export async function invalidateByPattern({
 }): Promise<void> {
 	try {
 		const keys = await redis.keys(pattern)
-		console.log(`[RedisPlugin] Invalidation pattern: "${pattern}" found ${keys.length} keys`)
 		if (keys.length > 0) {
-			console.log(`[RedisPlugin] Deleting keys:`, keys)
 			await redis.del(...keys)
 		}
 	} catch (err) {
