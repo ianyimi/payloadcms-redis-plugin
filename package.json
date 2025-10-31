@@ -1,6 +1,6 @@
 {
 	"name": "payloadcms-redis-plugin",
-	"version": "0.2.14",
+	"version": "0.2.15",
 	"description": "Redis Plugin for PayloadCMS v3",
 	"license": "MIT",
 	"type": "module",

@@ -1,3 +1,10 @@
+## [0.2.15](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.14...v0.2.15) (2025-10-31)
+
+
+### Bug Fixes
+
+* fix getCollectionPattern and getGlobalPattern functions to invalidate cache options properly w a keyPrefix ([db4b43b](https://github.com/ianyimi/payloadcms-redis-plugin/commit/db4b43b3c61a200fa233accbe52a46926995b5cd))
+
 ## [0.2.14](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.13...v0.2.14) (2025-10-31)
 
 
