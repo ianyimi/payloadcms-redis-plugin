@@ -1,3 +1,10 @@
+## [0.2.17](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.16...v0.2.17) (2025-10-31)
+
+
+### Bug Fixes
+
+* remove console logs from cache pattern functions ([84031af](https://github.com/ianyimi/payloadcms-redis-plugin/commit/84031af1b1b56fde410450bc420c1dce3b963353))
+
 ## [0.2.16](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.15...v0.2.16) (2025-10-31)
 
 
