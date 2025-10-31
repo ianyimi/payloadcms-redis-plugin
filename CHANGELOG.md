@@ -1,3 +1,10 @@
+## [0.2.16](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.15...v0.2.16) (2025-10-31)
+
+
+### Bug Fixes
+
+* test cache invalidation with new debug logs ([72754d3](https://github.com/ianyimi/payloadcms-redis-plugin/commit/72754d31b231f25e617805a59cc8767743d05e4c))
+
 ## [0.2.15](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.14...v0.2.15) (2025-10-31)
 
 
