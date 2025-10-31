@@ -1,3 +1,10 @@
+## [0.2.14](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.13...v0.2.14) (2025-10-31)
+
+
+### Bug Fixes
+
+* update push crud operations to return the result instaed of undefined ([a9448c5](https://github.com/ianyimi/payloadcms-redis-plugin/commit/a9448c52905973d519f5c46b7cc69ff22fde57f5))
+
 ## [0.2.13](https://github.com/ianyimi/payloadcms-redis-plugin/compare/v0.2.12...v0.2.13) (2025-10-28)
 
 
